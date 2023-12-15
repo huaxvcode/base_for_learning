@@ -151,3 +151,11 @@ function ssh-copy-id([string]$userAtMachine, $args){
 
 ssh-copy-id -p 16600 lrq@127.0.0.1
 ```
+
+## .wslconfig
+
+在用户目录下，用户名目录下，复制 .wslconfig 文件
+
+[.wslconfig](/.wslconfig)
+
+![Snipaste_2023-12-15_22-58-28](/assets/Snipaste_2023-12-15_22-58-28.png)
