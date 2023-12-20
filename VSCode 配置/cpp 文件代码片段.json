@@ -5,7 +5,7 @@
 	// same ids are connected.
 	// Example:
 	"Print to console": {
-		"prefix": "code",
+		"prefix": "jk",
 		"body": [
 			"#include <bits/stdc++.h>",
 			"typedef long long var;",
