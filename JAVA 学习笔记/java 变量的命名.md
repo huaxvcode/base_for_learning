@@ -43,6 +43,7 @@ public class Main {
 public class Main {
     public static void main(String[] args) {
         final double pi;
+        
         pi = 3.14159265;
         System.out.println(pi);
     }
