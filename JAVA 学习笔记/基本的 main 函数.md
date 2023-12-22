@@ -21,3 +21,7 @@ public class Main {
     }
 }
 ```
+
+idea 定义代码片段
+
+![Snipaste_2023-12-23_00-20-12](/assets/Snipaste_2023-12-23_00-20-12.png)
