@@ -61,3 +61,107 @@ var t = qu.peek();
 ```java
 var t = qu.poll();
 ```
+
+### size
+
+查看元素个数
+
+```java
+var len = qu.size();
+```
+
+## 作为 Stack 使用
+
+尾进，尾出
+
+### push
+
+尾部添加元素 `x`
+
+```java
+qu.push(x);
+```
+
+### peek
+
+获取尾部元素
+
+```java
+var t = qu.peek();
+```
+
+### pop
+
+删除并拿出尾部元素
+
+```java
+var t = qu.pop();
+```
+
+### size
+
+获取元素个数
+
+```java
+var len = qu.size();
+```
+
+## 作为 Deque 使用
+
+双端队列，头尾皆可进出
+
+### offerFirst
+
+头部插入元素 `x`
+
+```java
+qu.offerFirst(x);
+```
+
+### offerLast
+
+尾部插入元素 `y`
+
+```java
+qu.offerLast(y);
+```
+
+### peekFirst
+
+获取头部元素
+
+```java
+var t = qu.peekFirst();
+```
+
+### peekLast
+
+获取尾部元素
+
+```java
+var t = qu.peekLast();
+```
+
+### pollFirst
+
+删除并拿出头部元素
+
+```java
+var t = qu.pollFirst();
+```
+
+### pollLast
+
+删除并拿出尾部元素
+
+```java
+var t = qu.pollLast();
+```
+
+### size
+
+获取元素个数
+
+```java
+var len = qu.size();
+```
