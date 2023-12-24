@@ -65,3 +65,11 @@ boolean status = set.remove(x);
 ```
 
 如果删除成功，就返回 `true`，否则返回 `false`
+
+### size
+
+获取元素个数
+
+```java
+var len = set.size();
+```
