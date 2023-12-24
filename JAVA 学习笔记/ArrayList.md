@@ -83,3 +83,21 @@ a.set(i, x);
 ```java
 var len = a.size();
 ```
+
+### 排序
+
+升序排列：
+
+```java
+Arrays.sort(a, 0, a.size(), (x, y) -> {
+    return x - y;
+});
+```
+
+降序排列：
+
+```java
+Arrays.sort(a, 0, a.size(), (x, y) -> {
+    return -(x - y);
+});
+```
