@@ -14,7 +14,7 @@ output:
 
 # lambda 表达式
 
-对于只有一个抽象方法的接口，需要这种接口的对象时，就可以提供一个 lambda 表达式
+**对于只有一个抽象方法的接口，需要这种接口的对象时，就可以提供一个 lambda 表达式**
 
 这种接口，也称为函数式接口，只有一个抽象方法的接口
 
@@ -98,3 +98,55 @@ public class Main {
     }
 }
 ```
+
+---
+
+示例三：
+
+**接口变量可以直接指向 lambda 表达式**
+
+```java
+import java.util.*;
+
+interface Rd {
+    Random getRd();
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Rd rd = () -> { return new Random(new Date().getTime()); };
+        System.out.println(rd.getRd().nextInt());
+    }
+}
+```
+
+再例如，如果接口中存在静态字段呢？
+
+静态字段在接口中都默认是 `public static final` 类型
+
+```java
+import java.util.*;
+
+interface Rd {
+    double pi = 3.14159265358979323;
+    Random getRd();
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Rd rd = () -> { return new Random(new Date().getTime()); };
+        System.out.println(rd.getRd().nextInt());
+
+        System.out.println(rd.pi);
+    }
+}
+```
+
+程序输出：
+
+```
+-150451432
+3.141592653589793
+```
+
+**用 lambda 表达式生成的接口对象，不仅完善了抽象方法的功能，还保留了静态字段的内容，倒不如说，静态字段的内容为所有接口对象所共享**
