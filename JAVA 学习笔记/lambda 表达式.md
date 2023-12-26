@@ -22,7 +22,9 @@ output:
 
 ---
 
-对于只有一个抽象方法的接口，需要这种接口的对象时，就可以提供一个 lambda 表达式，示例：
+对于只有一个抽象方法的接口，需要这种接口的对象时，就可以提供一个 lambda 表达式
+
+示例一：
 
 ```java
 interface Rd {
@@ -47,3 +49,52 @@ public class Main {
 在主类 `Main` 里面有一个静态方法 `getRd`，该静态方法接收一个接口对象 `Rd rd`，利用这个接口对象调用 `rd.getRd()` 方法，返回一个随机数对象
 
 可以使用 lambda 表达式作为静态方法 `getRd` 的常数，传入进去
+
+---
+
+示例二：
+
+自定义接口排序规则，实现快速排序：
+
+```java
+import java.util.*;
+
+interface Cmp {
+    int cmp(int x, int y);
+}
+
+public class Main {
+    // 利用接口比较，实现一个快速排序
+    public static void sort(int[] a, int l, int r, Cmp cmp) {
+        if (l >= r) return;
+        int mid = (l + r) >> 1;
+        int x = a[mid];
+        int i = l - 1, j = r + 1;
+        while (i < j) {
+            while (cmp.cmp(a[++ i], x) < 0);
+            while (cmp.cmp(x, a[-- j]) < 0);
+            if (i < j) {
+                var t = a[i]; a[i] = a[j]; a[j] = t;
+            }
+        }
+        sort(a, l, j, cmp);
+        sort(a, j + 1, r, cmp);
+    }
+
+    public static void main(String[] args) {
+        int n = 15;
+        int[] a = new int[n + 10];
+        var rd = new Random(new Date().getTime());
+        for (int i = 1; i <= n; i ++) a[i] = rd.nextInt(10) + 1;
+        System.out.print("原数组为：");
+        for (int i = 1; i <= n; i ++) System.out.print(a[i] + " ");
+        System.out.println();
+        sort(a, 1, n, (x, y) -> {
+            return y - x;
+        });
+        System.out.print("逆序排列：");
+        for (int i = 1; i <= n; i ++) System.out.print(a[i] + " ");
+        System.out.println();
+    }
+}
+```
