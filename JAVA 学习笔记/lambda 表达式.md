@@ -153,4 +153,84 @@ public class Main {
 
 ---
 
-java 没有函数这一说法，但是却有函数式接口，即：一个接口中，只存在一个抽象方法时，就可成为函数式接口，所有的函数式接口，都可用 lambda 表达式实现一个对象
+java 没有函数这一说法，但是却有函数式接口，即：一个接口中，只存在一个抽象方法时，就可成为函数式接口，所有的函数式接口，都可用 lambda 表达式生成一个函数式接口的对象
+
+---
+
+示例四：
+
+**你甚至可以用现有的方法生成一个函数式接口的对象**
+
+现有的方法：不管是静态方法，还是实例方法都可以
+
+```java
+import java.util.*;
+
+interface Rd {
+    Random getRd();
+}
+
+public class Main {
+    public static Random getRd() { return new Random(new Date().getTime()); }
+    public Random getRd_() { return new Random(new Date().getTime()); }
+    public static void main(String[] args) {
+        Rd rd1 = Main::getRd;
+        var cmd = new Main();
+        Rd rd2 = cmd::getRd_;
+        System.out.println(rd1.getRd().nextInt());
+        System.out.println(rd2.getRd().nextInt());
+    }
+}
+```
+
+上方示例就使用了静态方法 `Main::getRd` 和实例方法 `cmd::getRd_` 生成了一个 `Rd` 对象
+
+`Main::getRd` 是一个方法的引用，它指示编译器生成一个函数式接口的实例
+
+---
+
+如果函数式接口的抽象方法有如下参数：`(x, y)`
+
+**类名::静态方法** 与 **对象::实例方法** 与 **lambda** 表达式基本等同，抽象方法有多少个参数，他们就要有多少个参数，可以将他们看做是抽象方法的一次实现
+
+但是，**类名::实例方法** 与上面的会有些许的不同，就算抽象方法有 $n$ 个参数需要传递，但是 类名::实例方法 只有 $n - 1$ 个参数，抽象方法的第一个参数会作为对象来调用该实例方法，并将后面的 $n - 1$ 个参数传入该方法中，示例：
+
+```java
+import java.util.*;
+class Max {
+    int max(int... args) {
+        if (args.length == 0) return Integer.MIN_VALUE;
+        int res = args[0];
+        for (var x : args) res = x > res ? x : res;
+        return res;
+    }
+}
+interface GetMax {
+    int max(Max tl, int... args);
+}
+public class Main {
+    public static int max(GetMax itf, int... args) {
+        return itf.max(new Max(), args);
+    }
+    public static void main(String... args) {
+        var res = max(Max::max, 2, 3, 1, 4, 5, 2, 3, 10);
+        System.out.println(res);
+    }
+}
+```
+
+正如上方的示例，我们观察到：
+
+```java
+public static int max(GetMax itf, int... args) {
+    return itf.max(new Max(), args);
+}
+```
+
+接口对象调用抽象方法 `max` 时，传入了参数 `new Max()` 和 `args`，编译器会将这些参数这样传递给 类名::实例方法：`new Max().max(args)`
+
+如果是传递给 类名::静态方法、对象::实例方法、lambda 表达式，就直接传 `max(new Max(), args)`
+
+换句话理解：传入到函数式接口的抽象方法中的参数，会全部依次不动的传入到 **类名::静态方法**、**对象::实例方法**、**lambda 表达式**
+
+---
