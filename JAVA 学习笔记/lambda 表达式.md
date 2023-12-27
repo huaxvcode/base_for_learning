@@ -243,6 +243,10 @@ lambda 表达式有三个部分：
 - 代码块
 - 自由变量，这里指非参数而且不在代码块中定义的变量
 
+**凡是在 lambda 表达式中出现的自由变量，似乎都被编译器加上了 `final` 修饰符**
+
+**这样就导致我们无法在 lambda 表达式中和 lambda 表达式外面修改自由变量的指向**
+
 ---
 
 示例一：
@@ -277,6 +281,8 @@ hello world
 ```
 
 lambda 表达式使用了外部变量 `s` 和 `pi` 并且成功输出
+
+因为在 lambda 表达式并没有改变外部变量的值
 
 ---
 
@@ -371,11 +377,34 @@ public class Main {
 }
 ```
 
-上面两个代码，无一例外的报错：
+```java
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        String name = "雾枝";
+        Show t = () -> {
+            System.out.println(name);
+        };
+        t.print();
+        // 在 lambda 表达式外围改变变量 name 的指向
+        name = "篝之雾枝";
+    }
+}
+```
+
+上面三个代码，无一例外的报错：
 
 > java: 从lambda 表达式引用的本地变量必须是最终变量或实际上的最终变量
 
-至少我们能得出一个结论：在 lambda 表达式中无法修改外部变量的指向
+**凡是在 lambda 表达式中出现的自由变量，似乎都被编译器加上了 `final` 修饰符**
+
+**这样就导致我们无法在 lambda 表达式中和 lambda 表达式外面修改自由变量的指向**
 
 ---
 
@@ -403,26 +432,21 @@ public class Main {
 
         // return 一个 lambda 表达式，并尝试调用外部变量的函数，
         // 不改变外部变量的指向，仅修改外部变量内部的数值
-        return () -> {
+        Show ts = () -> {
             t.setPi(3.14159265);
             System.out.println(t);
         };
+        ts.print();
+        // 外部变量 t 的值确实发生了更改
+        System.out.println(t);
+        return ts;
     }
-    
+
     public static void main(String[] args) {
         var t = f();
-        t.print();
     }
 }
 ```
-
-代码输出：
-
-```
-3.14159265
-```
-
-似乎，lambda 表达式保存了一份外部变量的副本，并且这个副本增加了 `final` 修饰
 
 ---
 
