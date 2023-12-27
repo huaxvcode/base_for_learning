@@ -234,3 +234,195 @@ public static int max(GetMax itf, int... args) {
 换句话理解：传入到函数式接口的抽象方法中的参数，会全部依次传入到 **类名::静态方法**、**对象::实例方法**、**lambda 表达式** 中，但对于 **类名::实例方法**，会将第一个参数作为对象来调用该实例方法，然后将剩下的参数依次传入到该实例方法中
 
 ---
+
+## 变量作用域
+
+lambda 表达式有三个部分：
+
+- 参数
+- 代码块
+- 自由变量，这里指非参数而且不在代码块中定义的变量
+
+---
+
+示例一：
+
+```java
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+public class Main {
+    public static void main(String[] args) {
+        String s = "hello world";
+        double pi = 3.14;
+        
+        // lambda 表达式
+        Show t = () -> {
+            System.out.println(s);
+            System.out.println(pi);
+        };
+        t.print();
+    }
+}
+```
+
+代码输出：
+
+```
+hello world
+3.14
+```
+
+lambda 表达式使用了外部变量 `s` 和 `pi` 并且成功输出
+
+---
+
+示例二：
+
+```java
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+public class Main {
+    static Show showName() {
+        String s = "一花";
+
+        // return 一个 lambda 表达式
+        return () -> {
+            System.out.println(s);
+        };
+    }
+
+    public static void main(String[] args) {
+        var t = showName();
+        t.print();
+    }
+}
+```
+
+代码输出：
+
+```java
+一花
+```
+
+函数返回了一个 `lambda` 表达式，且该 lambda 表达式使用了函数内定义的变量 `s`
+
+一个有趣的现象：函数的生命周期都结束了，但是 lambda 表达式却似乎仍然能够使用该变量？
+
+---
+
+示例三：
+
+```java
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+public class Main {
+    public static void main(String[] args) {
+        String s = "hello world";
+        double pi = 3.14;
+
+        // lambda 表达式
+        Show t = () -> {
+            // 尝试在 lambda 表达式内修改外部变量 pi
+            pi = 3.14159265358979323;
+
+            System.out.println(s);
+            System.out.println(pi);
+        };
+        t.print();
+    }
+}
+```
+
+```java
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+public class Main {
+    static Show showName() {
+        String s = "一花";
+
+        // return 一个 lambda 表达式
+        return () -> {
+            // 尝试在 lambda 表达式内修改外部变量 s
+            s = "hello world";
+            System.out.println(s);
+        };
+    }
+
+    public static void main(String[] args) {
+        var t = showName();
+        t.print();
+    }
+}
+```
+
+上面两个代码，无一例外的报错：
+
+> java: 从lambda 表达式引用的本地变量必须是最终变量或实际上的最终变量
+
+至少我们能得出一个结论：在 lambda 表达式中无法修改外部变量的指向
+
+---
+
+示例四：
+
+```java
+import javax.tools.Tool;
+import java.util.*;
+
+interface Show {
+    void print();
+}
+
+class Tools {
+    double pi = 3.14;
+    void setPi(double tPi) { pi = tPi; }
+
+    @Override
+    public String toString() { return "" + pi; }
+}
+
+public class Main {
+    static Show f() {
+        var t = new Tools();
+
+        // return 一个 lambda 表达式，并尝试调用外部变量的函数，
+        // 不改变外部变量的指向，仅修改外部变量内部的数值
+        return () -> {
+            t.setPi(3.14159265);
+            System.out.println(t);
+        };
+    }
+    
+    public static void main(String[] args) {
+        var t = f();
+        t.print();
+    }
+}
+```
+
+代码输出：
+
+```
+3.14159265
+```
+
+似乎，lambda 表达式保存了一份外部变量的副本，并且这个副本增加了 `final` 修饰
+
+---
+
