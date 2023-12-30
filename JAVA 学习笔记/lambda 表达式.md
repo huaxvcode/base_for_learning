@@ -235,177 +235,50 @@ public static int max(GetMax itf, int... args) {
 
 ---
 
-## 变量作用域
+## 如何使用外部的变量
 
-lambda 表达式有三个部分：
+lambda 表达式内部能调用的外部变量，只能是外面的『事实最终局部变量』和字段
 
-- 参数
-- 代码块
-- 自由变量，这里指非参数而且不在代码块中定义的变量
+如果是局部变量，就必须是『事实最终局部变量』，但是对字段并没有任何限制要求
 
-**凡是在 lambda 表达式中出现的自由变量，似乎都被编译器加上了 `final` 修饰符**
+『事实最终局部变量』：指那些加了 `final` 修饰的或者没有加 `final` 修饰，但是在使用中没有改变值的局部变量，一经赋值就不再改变值，而且赋值是在创建后立马进行的局部变量
 
-**这样就导致我们无法在 lambda 表达式中和 lambda 表达式外面修改自由变量的指向**
-
----
-
-示例一：
+下方代码中，只有注释掉 `pi = 3.141592` 这一行后才不报错：
 
 ```java
+import java.io.*;
 import java.util.*;
 
-interface Show {
+interface A {
     void print();
 }
 
 public class Main {
-    public static void main(String[] args) {
-        String s = "hello world";
+    BufferedReader cin;
+    PrintWriter cout;
+
+    {
+        cin = new BufferedReader(new InputStreamReader(System.in));
+        cout = new PrintWriter(new OutputStreamWriter(System.out));
+
+    }
+    void solve() {
         double pi = 3.14;
-        
-        // lambda 表达式
-        Show t = () -> {
-            System.out.println(s);
-            System.out.println(pi);
+        A t = () -> {
+// ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+            pi = 3.141592; // 引用的局部变量，必须是『事实最终变量』，但是字段没有限制，所以这句话报错，但是下面两句话的允许的
+// ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+            cin = new BufferedReader(new InputStreamReader(System.in));
+            cout = new PrintWriter(new OutputStreamWriter(System.out));
+            cout.println("hello world");
+            cout.flush();
         };
         t.print();
     }
-}
-```
-
-代码输出：
-
-```
-hello world
-3.14
-```
-
-lambda 表达式使用了外部变量 `s` 和 `pi` 并且成功输出
-
-因为在 lambda 表达式并没有改变外部变量的值
-
----
-
-示例二：
-
-```java
-import java.util.*;
-
-interface Show {
-    void print();
-}
-
-public class Main {
-    static Show showName() {
-        String s = "一花";
-
-        // return 一个 lambda 表达式
-        return () -> {
-            System.out.println(s);
-        };
-    }
-
     public static void main(String[] args) {
-        var t = showName();
-        t.print();
+        var cmd = new Main();
+        cmd.solve();
     }
 }
 ```
-
-代码输出：
-
-```java
-一花
-```
-
-函数返回了一个 `lambda` 表达式，且该 lambda 表达式使用了函数内定义的变量 `s`
-
-一个有趣的现象：函数的生命周期都结束了，但是 lambda 表达式却似乎仍然能够使用该变量？
-
----
-
-示例三：
-
-```java
-import java.util.*;
-
-interface Show {
-    void print();
-}
-
-public class Main {
-    public static void main(String[] args) {
-        String s = "hello world";
-        double pi = 3.14;
-
-        // lambda 表达式
-        Show t = () -> {
-            // 尝试在 lambda 表达式内修改外部变量 pi
-            pi = 3.14159265358979323;
-
-            System.out.println(s);
-            System.out.println(pi);
-        };
-        t.print();
-    }
-}
-```
-
-```java
-import java.util.*;
-
-interface Show {
-    void print();
-}
-
-public class Main {
-    static Show showName() {
-        String s = "一花";
-
-        // return 一个 lambda 表达式
-        return () -> {
-            // 尝试在 lambda 表达式内修改外部变量 s
-            s = "hello world";
-            System.out.println(s);
-        };
-    }
-
-    public static void main(String[] args) {
-        var t = showName();
-        t.print();
-    }
-}
-```
-
-```java
-import java.util.*;
-
-interface Show {
-    void print();
-}
-
-public class Main {
-
-    public static void main(String[] args) {
-        String name = "雾枝";
-        Show t = () -> {
-            System.out.println(name);
-        };
-        t.print();
-        // 在 lambda 表达式外围改变变量 name 的指向
-        name = "篝之雾枝";
-    }
-}
-```
-
-上面三个代码，无一例外的报错：
-
-> java: 从lambda 表达式引用的本地变量必须是最终变量或实际上的最终变量
-
-**凡是在 lambda 表达式中出现的自由变量，似乎都被编译器加上了 `final` 修饰符**
-
-**这样就导致我们无法在 lambda 表达式中和 lambda 表达式外面修改自由变量的指向**
-
----
-
 
